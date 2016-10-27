@@ -74,9 +74,37 @@ sub_test([Head|TempList],[Head|TempSubList],List,SubList):-
 	sub_test(TempList,TempSubList,List,SubList).
 sub_test([Head|TempList],[Head_1|TempSubList],[H|List],SubList):-
 	sub_list(List,SubList). 
+
+%13 
+sieve([],Element,[]).	
+sieve([Head|List],Element,[Head|Output]):-
+	Head>=Element,
+	sieve(List,Element,Output).
+sieve([Head|List],Element,Output):-
+	sieve(List,Element,Output).
+
+%14
+partition([],Size,Size,[],[]):-!.
+partition(List,Size,Counter,List1,List2):-
+	Counter=0,
+	size(List,Size1),
+	Counter1 is Counter+1,
+	partition(List,Size1,Counter1,List1,List2).
+partition([H|List],Size,Counter,[H|List1],List2):-
+	Counter<Size/2,
+	Counter1 is Counter+1,
+	partition(List,Size,Counter1,List1,List2).
+partition([H|List],Size,Counter,List1,[H|List2]):-
+	Counter>=Size/2,
+	Counter1 is Counter+1,
+	partition(List,Size,Counter1,List1,List2).
+
+size([],1).
+size([Head|List],Size):-
+	size(List,SizeR), 
+	Size is SizeR+1.
 	
-
-
 %run 
-run(List):-
-	sub_list([1,1,2,3],[1,1,1,2,3]).
+run(List1,List2):-
+	partition([1,2,5,3,5],0,0,List1,List2).
+
