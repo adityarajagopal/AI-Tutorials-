@@ -21,6 +21,7 @@ member([_|L],M):-
 	member(L,M).
 
 %5
+append_list([],[],[]).
 append_list([],N,N).
 append_list([H|T],N,[H|List]):-
 	append_list(T,N,List).
@@ -104,7 +105,35 @@ size([Head|List],Size):-
 	size(List,SizeR), 
 	Size is SizeR+1.
 	
+%15
+partition_qs([],Target,[],[]):-!.
+partition_qs([H|List],Target,[H|List1],List2):-
+	H=<Target,
+	partition_qs(List,Target,List1,List2).
+partition_qs([H|List],Target,List1,[H|List2]):-
+	H>Target,
+	partition_qs(List,Target,List1,List2).
+
+%16
+quicksort([],[]).
+quicksort([H|[]],[H]).
+quicksort(List,List):-
+	all_same(List).
+quicksort([H|List],Output):-
+	partition_qs(List,H,List1,List2),
+	append_list(List1,[H],List1_App),
+	format("List1:~w \n List2:~w \n",[List1_App,List2]),
+	quicksort(List1_App,Out1),
+	quicksort(List2,Out2),
+	append_list(Out1,Out2,Output).
+
+all_same([],H).
+all_same([H|List]):-
+	all_same(List,H).
+all_same([H|List],H):-
+	all_same(List,H).
+
 %run 
-run(List1,List2):-
-	partition([1,2,5,3,5],0,0,List1,List2).
+run(List1):-
+	quicksort([1,8,8,8,3,4,2,2],List1).
 
