@@ -15,8 +15,7 @@ exclude_last([H|T],[H|M]):-
 	exclude_last(T,M).
 
 %4
-member([M|_],M):-
-	!.
+member([M|_],M):-!.
 member([_|L],M):-
 	member(L,M).
 
@@ -108,17 +107,15 @@ size([Head|List],Size):-
 %15
 partition_qs([],Target,[],[]):-!.
 partition_qs([H|List],Target,[H|List1],List2):-
-	H=<Target,
+	H<Target,
 	partition_qs(List,Target,List1,List2).
 partition_qs([H|List],Target,List1,[H|List2]):-
-	H>Target,
+	H>=Target,
 	partition_qs(List,Target,List1,List2).
 
 %16
 quicksort([],[]).
 quicksort([H|[]],[H]).
-quicksort(List,List):-
-	all_same(List).
 quicksort([H|List],Output):-
 	partition_qs(List,H,List1,List2),
 	append_list(List1,[H],List1_App),
@@ -126,13 +123,31 @@ quicksort([H|List],Output):-
 	quicksort(List2,Out2),
 	append_list(Out1,Out2,Output).
 
-all_same([],H).
-all_same([H|List]):-
-	all_same(List,H).
-all_same([H|List],H):-
-	all_same(List,H).
+%17
+subset(List,[]):-!.
+subset([H|List],[H|Subset]):-
+	subset(List,Subset).
+subset([H|List],[H1|Subset]):-
+	subset(List,[H1|Subset]).
+	
+%18
+intersection([],List2,[]):-!.
+intersection([H|List1],List2,[H|ISection]):-
+	member(List2,H), 
+	delete_all(List1,H,List1New),
+	intersection(List1New,List2,ISection).
+intersection([H|List1],List2,ISection):-
+	\+member(List2,H),
+	delete_all(List1,H,List1New),
+	intersection(List1New,List2,ISection).
+
+%19
+union([],List2,List2).
+union([H|List1],List2,[H|Union]):-
+	delete_all(List1,H,List1New),
+	delete_all(List2,H,List2New),
+	union(List1New,List2New,Union).
 
 %run 
 run(List1):-
-	quicksort([1,8,8,8,3,4,2,2],List1).
-
+	union([1,2,3,4,4,2,3,2],[1,1,3,6,7,8,4],List1).
