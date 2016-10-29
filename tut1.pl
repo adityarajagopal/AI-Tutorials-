@@ -122,7 +122,6 @@ quicksort(List,List):-
 quicksort([H|List],Output):-
 	partition_qs(List,H,List1,List2),
 	append_list(List1,[H],List1_App),
-	format("List1:~w \n List2:~w \n",[List1_App,List2]),
 	quicksort(List1_App,Out1),
 	quicksort(List2,Out2),
 	append_list(Out1,Out2,Output).
