@@ -1,3 +1,5 @@
+%Question1
+
 % 1
 head([H|T],H). 
 
@@ -103,6 +105,11 @@ size([],1).
 size([Head|List],Size):-
 	size(List,SizeR), 
 	Size is SizeR+1.
+
+partition_half(List,A,B):-
+	length(A,N),
+	length(B,N),
+	append_list(A,B,List).
 	
 %15
 partition_qs([],Target,[],[]):-!.
@@ -123,13 +130,19 @@ quicksort([H|List],Output):-
 	quicksort(List2,Out2),
 	append_list(Out1,Out2,Output).
 
+qsort([],Acc,Acc).
+qsort([H|List],Acc,Output):-
+	partition_qs(List,H,List1,List2),
+	qsort(List2,Acc,RightSorted),
+	qsort(List1,[H|RightSorted],Output).
+
 %17
 subset(List,[]):-!.
 subset([H|List],[H|Subset]):-
 	subset(List,Subset).
 subset([H|List],[H1|Subset]):-
 	subset(List,[H1|Subset]).
-	
+
 %18
 intersection([],List2,[]):-!.
 intersection([H|List1],List2,[H|ISection]):-
@@ -148,6 +161,54 @@ union([H|List1],List2,[H|Union]):-
 	delete_all(List2,H,List2New),
 	union(List1New,List2New,Union).
 
+%Question2
+father(homer,bart).
+father(homer,lisa).
+father(homer,maggie).
+mother(marge,bart).
+mother(marge,lisa).
+mother(marge,maggie).
+married(homer,marge).
+father(dave,homer).
+father(jessica,marge).
+male(homer).
+male(bart).
+female(marge).
+female(lisa).
+female(maggie).
+
+parent(Parent):-
+	father(Parent,Child).
+parent(Parent):-
+	mother(Parent,Child).
+
+grandfather(Name):-
+	father(Name,Parent),
+	parent(Parent).
+grandmother(Name):-
+	mother(Name,Parent),
+	parent(Parent).
+
+grandparent(Name):-
+	grandfather(Name).
+grandparent(Name):-
+	grandmother(Name).
+
+brother(Name,Brother):-
+	father(A,Name),
+	father(A,Brother),
+	male(Brother).
+brother(Name,Brother):-
+	mother(A,Name),
+	mother(A,Brother),
+	male(Brother).
+
 %run 
-run(List1):-
-	union([1,2,3,4,4,2,3,2],[1,1,3,6,7,8,4],List1).
+run(L1):-
+	qsort([2,4,3,2,1],[],L1).
+
+
+
+
+
+
