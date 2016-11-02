@@ -60,14 +60,15 @@ choose([Path|Paths], Path, Paths).
 this adds a new path to the set of all possible paths 
 This function also varies between different search algorithms
 */
-/*
 %DF algorithm
 add_to_paths(NewPath,OldPath,AllPaths):- 
 	append(NewPath,OldPath,AllPaths).
-*/
 %BF algorithm
+/*
 add_to_paths(NewPath,OldPath,AllPaths):-
 	append(OldPath,NewPath,AllPaths).
+*/
+
 /**
 one_step_extentions takes the first node of a path 
 and returns a list of lists which contain new paths 
@@ -91,7 +92,7 @@ one_step_extentions([Node|Path],NewPaths):-
 
 goal_state((4,0)).
 
-%Generic version which can be used with all algorithms
+%Generic version which can be used with most algorithms
 /**
 base case for search 
 Paths is a list of lists with different paths 
@@ -151,11 +152,63 @@ search([Node|Path],SolnPath):-
 	make_node(Rule,NewState,_,NewNode),
 	search([NewNode,Node|Path],SolnPath).
 */
+%IDDF version of search 
+/*
+Base case where goal state is reached
+*/
+search(Paths,[Node|Path],Depth):-
+	choose(Paths,[Node|Path],_),
+	state_of(Node,State),
+	goal_state(State).
+/*
+Case when you reach a node at depth = depth limit 
+Everytime the search predicate is called, there is 
+a choice point where any of the 3 definitions can be 
+taken. The cut in this case means that once a "leaf"
+node is hit, you end that recursive path and don't try 
+any other versions of the predicate search, as in most
+cases the 3rd predicate would also match. 
+*/
+search(Paths,SolnPath,Depth):-
+	choose(Paths,Path,OtherPaths),
+	length(Path,PathLength),
+	PathDepth is PathLength-1,
+	PathDepth = Depth,!,
+	search(OtherPaths,SolnPath,Depth).
+search(Paths,SolnPath,Depth):-
+	choose(Paths,Path,OtherPaths),
+	one_step_extentions(Path,NewPaths),
+	add_to_paths(NewPaths,OtherPaths,AllPaths),
+	search(AllPaths,SolnPath,Depth).
+iddf_search(Paths,SolnPath,Depth):-
+	search(Paths,SolnPath,Depth). 
+iddf_search(Paths,SolnPath,Depth):-
+	Depth1 is Depth+1,
+	iddf_search(Paths,SolnPath,Depth1).
 
-
-
-
-
-
-
-
+/*
+%IDDF version with Lite GGSE for DF
+NOT WORKING!!!
+search([],[],[]).
+search([Node|Path],[Node|Path],_):-
+	state_of(Node,State),
+	goal_state(State).
+search(Path,SolnPath,Depth):-
+	length(Path,PathLength), 
+	PathDepth is PathLength-1, 
+	Depth = PathDepth.
+search([Node|Path],SolnPath,Depth):-
+	write("here1"),
+	state_of(Node,State), 
+	statechange(Rule,State,NewState),
+	loop_check(State,[Node|Path]),
+	make_node(Rule,NewState,_,NewNode),
+	search([NewNode,Node|Path],SolnPath,Depth).
+iddf_search(Paths,SolnPath,Depth):-
+	write("here"),nl,
+	search(Paths,SolnPath,Depth).
+iddf_search(Paths,SolnPath,Depth):-
+	Depth1 is Depth+1, 
+	write("depth: "),write(Depth1),nl,
+	iddf_search(Paths,SolnPath,Depth1).
+*/
