@@ -4,6 +4,7 @@
 The following section of code defines the 6 different
 actions that the AI can do
 */
+/*
 statechange(fill_7, (_,A), (7,A)).
 statechange(fill_5, (A,_), (A,5)).
 statechange(empty_7, (_,A), (0,A)).
@@ -21,8 +22,72 @@ statechange(pour_5, (A,B), (All,0)):-
 	All=<7. 
 statechange(pour_5, (A,B), (7,All)):-
 	All is A+B-7, 
-	All > 0. 
-%
+	All > 0.
+goal_state((4,0)).
+*/
+
+%Question2
+/*
+statechange(rule_1,State1,State2):-
+	append(List,['S'],State1),
+	append(State1,['N'],State2).
+statechange(rule_2,State1,State2):-
+	append(['I'],List,State1),
+	append(State1,List,State2).
+statechange(rule_3,State1,State2):-
+	append(List,['S','S','S'|List1],State1),
+	append(List,['N'|List1],State2).
+statechange(rule_4,State1,State2):-
+	append(List,['N','N'|List1],State1),
+	append(List,List1,State2).
+goal_state((['I','N'])).
+*/
+%Question3
+split(List,A,B,C):- 
+	append(Temp,C,List),
+	append(A,B,Temp),
+	length(A,N),
+	length(B,N),
+	length(C,N1),
+	N\=0.
+
+sum([],0).
+sum([a|List],Weight):-
+	sum(List,Weight1),
+	Weight is Weight1+1.
+sum([b|List],Weight):-
+	sum(List,Weight1),	
+	Weight is Weight1+1.1.
+
+statechange(split_l,(Left,_,_,l,N),(Left1,Right1,Out1,u,N)):-
+	split(Left,Left1,Right1,Out1).
+statechange(split_r,(_,Right,_,r,N),(Left1,Right1,Out1,u,N)):-
+	split(Right,Left1,Right1,Out1).
+statechange(split_o,(_,_,Out,o,N),(Left1,Right1,Out1,u,N)):-
+	split(Out,Left1,Right1,Out1).
+statechange(select_left,(Left,Right,_,u,N),(Left,Right,Out,l,N1)):-
+	N<3,
+	sum(Left,WL),
+	sum(Right,WR),
+	WL>WR,
+	N1 is N+1.
+statechange(select_right,(Left,Right,_,u,N),(Left,Right,Out,r,N1)):-
+	N<3,
+	sum(Left,WL),
+	sum(Right,WR),
+	WL<WR,
+	N1 is N+1.
+statechange(select_out,(Left,Right,Out,u,N),(Left,Right,Out,o,N1)):-
+	N<3,
+	sum(Left,WL),
+	sum(Right,WR),
+	WL=WR,
+	N1 is N+1.
+
+goal_state(([b],_,_,l,_)).
+goal_state((_,[b],_,r,_)).
+goal_state((_,_,[b],o,_)).
+%General Graph Search Engine
 /**
 make_node creates a new node in the tree
 
@@ -83,14 +148,14 @@ The goal of the findall has 3 statements in it :
 	the new path that is returned
 */
 one_step_extentions([Node|Path],NewPaths):-
-	state_of(Node,State), 
+	state_of(Node,State),
+	%write("OSE_state: "),write(State),nl,
 	findall([NewNode,Node|Path],
 			(statechange(Rule,State,NewState),
 			loop_check(NewState,[Node|Path]),
 			make_node(Rule,NewState,_,NewNode)),
 			NewPaths).
 
-goal_state((4,0)).
 
 %Generic version which can be used with most algorithms
 /**
@@ -99,10 +164,12 @@ Paths is a list of lists with different paths
 the base case matched the head of the current path with 
 the goal state
 */
+/*
 search(Paths,[Node|Path]):-
 	choose(Paths,[Node|Path],_),
 	state_of(Node,State),
 	goal_state(State).
+*/
 /**
 main definition of the search function 
 chooses a new path from the list of paths 
@@ -112,11 +179,13 @@ puts new paths at the start of the list of all paths
 (this last step is what makes this algorithm DF 
 as it keeps searching the current path till the end)
 */
+/*
 search(Paths,SolnPath):-
 	choose(Paths,Path,OtherPaths),
 	one_step_extentions(Path,NewPaths),
 	add_to_paths(NewPaths,OtherPaths,AllPaths), 
 	search(AllPaths,SolnPath).
+*/
 
 %Lite version which can only be used with DF algorithm
 /**
@@ -152,6 +221,7 @@ search([Node|Path],SolnPath):-
 	make_node(Rule,NewState,_,NewNode),
 	search([NewNode,Node|Path],SolnPath).
 */
+
 %IDDF version of search 
 /*
 Base case where goal state is reached
@@ -178,12 +248,14 @@ search(Paths,SolnPath,Depth):-
 search(Paths,SolnPath,Depth):-
 	choose(Paths,Path,OtherPaths),
 	one_step_extentions(Path,NewPaths),
+	%write(NewPaths),nl,
 	add_to_paths(NewPaths,OtherPaths,AllPaths),
 	search(AllPaths,SolnPath,Depth).
 iddf_search(Paths,SolnPath,Depth):-
 	search(Paths,SolnPath,Depth). 
 iddf_search(Paths,SolnPath,Depth):-
 	Depth1 is Depth+1,
+	write("Depth: "),write(Depth1),nl,
 	iddf_search(Paths,SolnPath,Depth1).
 
 /*
