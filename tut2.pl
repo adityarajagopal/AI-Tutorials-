@@ -43,6 +43,7 @@ statechange(rule_4,State1,State2):-
 goal_state((['I','N'])).
 */
 %Question3
+/*
 split(List,A,B,C):- 
 	append(Temp,C,List),
 	append(A,B,Temp),
@@ -87,6 +88,65 @@ statechange(select_out,(Left,Right,Out,u,N),(Left,Right,Out,o,N1)):-
 goal_state(([b],_,_,l,_)).
 goal_state((_,[b],_,r,_)).
 goal_state((_,_,[b],o,_)).
+*/
+
+%Question4
+member([M|_],M):-!.
+member([_|L],M):-
+	member(L,M).
+
+delete([Goal|Tail],Goal,Tail):-
+	!.
+delete([Head|Tail],Goal,[Head|Output]):-
+	delete(Tail,Goal,Output).
+
+bridge_1(w,y).
+bridge_1(y,w).
+bridge_2(w,y).
+bridge_2(y,w).
+bridge_3(y,z).
+bridge_3(z,y).
+bridge_4(z,x).
+bridge_4(x,z).
+bridge_5(x,w).
+bridge_5(w,x).
+bridge_6(x,w).
+bridge_6(w,x).
+bridge_7(w,z).
+bridge_7(z,w).
+
+statechange(cross_bridge_1,(Island,Bridges_not_crossed),(NewPlace,New_List)):-
+	member(Bridges_not_crossed,b1),
+	delete(Bridges_not_crossed,b1,New_List),
+	bridge_1(Island,NewPlace).
+statechange(cross_bridge_2,(Island,Bridges_not_crossed),(NewPlace,New_List)):-
+	member(Bridges_not_crossed,b2),
+	delete(Bridges_not_crossed,b2,New_List),
+	bridge_2(Island,NewPlace).
+statechange(cross_bridge_3,(Island,Bridges_not_crossed),(NewPlace,New_List)):-
+	member(Bridges_not_crossed,b3),
+	delete(Bridges_not_crossed,b3,New_List),
+	bridge_3(Island,NewPlace).
+statechange(cross_bridge_4,(Island,Bridges_not_crossed),(NewPlace,New_List)):-
+	member(Bridges_not_crossed,b4),
+	delete(Bridges_not_crossed,b4,New_List),
+	bridge_4(Island,NewPlace).
+statechange(cross_bridge_5,(Island,Bridges_not_crossed),(NewPlace,New_List)):-
+	member(Bridges_not_crossed,b5),
+	delete(Bridges_not_crossed,b5,New_List),
+	bridge_5(Island,NewPlace).
+statechange(cross_bridge_6,(Island,Bridges_not_crossed),(NewPlace,New_List)):-
+	member(Bridges_not_crossed,b6),
+	delete(Bridges_not_crossed,b6,New_List),
+	bridge_6(Island,NewPlace).
+statechange(cross_bridge_7,(Island,Bridges_not_crossed),(NewPlace,New_List)):-
+	member(Bridges_not_crossed,b7),
+	delete(Bridges_not_crossed,b7,New_List),
+	bridge_7(Island,NewPlace).
+
+goal_state((_,[])).
+
+
 %General Graph Search Engine
 /**
 make_node creates a new node in the tree
